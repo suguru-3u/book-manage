@@ -1,6 +1,5 @@
 package com.book.manager.presentation.controller
 
-import com.book.manager.domain.domain.BookWithRental
 import com.book.manager.presentation.form.BookInfo
 import com.book.manager.presentation.form.GetBookListResponse
 import com.book.manager.presentation.form.GetBookDetailResponse
