@@ -4,16 +4,20 @@ import com.book.manager.domain.domain.Book
 import com.book.manager.domain.domain.BookWithRental
 import com.book.manager.domain.domain.Rental
 import com.book.manager.domain.repository.BookRepository
+import com.book.manager.infrastructure.database.mapper.BookMapper
 import com.book.manager.infrastructure.database.mapper.custom.BookWithRentalMapper
 import com.book.manager.infrastructure.database.mapper.custom.select
 import com.book.manager.infrastructure.database.mapper.custom.selectByPrimaryKey
+import com.book.manager.infrastructure.database.mapper.insert
+import com.book.manager.infrastructure.database.record.BookRecord
 import com.book.manager.infrastructure.database.record.BookWithRentalRecord
 import org.springframework.stereotype.Repository
 
 @Suppress("SpringJavaInjectionPointsAutowiringInspection")
 @Repository
 class BookRepositoryImpl(
-    private val bookWithRentalMapper:BookWithRentalMapper
+    private val bookWithRentalMapper:BookWithRentalMapper,
+    private val bookMapper: BookMapper
 ):BookRepository {
     override fun findAllWithRental():List<BookWithRental>{
         return  bookWithRentalMapper.select().map { toModel(it)}
@@ -39,6 +43,14 @@ class BookRepositoryImpl(
             )
         }
         return BookWithRental(book,rental)
+    }
+
+    override fun register(book: Book) {
+        bookMapper.insert(toRecord(book))
+    }
+
+    private fun toRecord(model: Book): BookRecord {
+        return BookRecord(model.id, model.title, model.author, model.releaseDate)
     }
 }
 
