@@ -9,25 +9,30 @@ import com.book.manager.infrastructure.database.mapper.custom.BookWithRentalMapp
 import com.book.manager.infrastructure.database.mapper.custom.select
 import com.book.manager.infrastructure.database.mapper.custom.selectByPrimaryKey
 import com.book.manager.infrastructure.database.mapper.insert
+import com.book.manager.infrastructure.database.mapper.updateByPrimaryKeySelective
 import com.book.manager.infrastructure.database.record.BookRecord
 import com.book.manager.infrastructure.database.record.BookWithRentalRecord
 import org.springframework.stereotype.Repository
+import java.time.LocalDate
 
 @Suppress("SpringJavaInjectionPointsAutowiringInspection")
 @Repository
 class BookRepositoryImpl(
-    private val bookWithRentalMapper:BookWithRentalMapper,
+    private val bookWithRentalMapper: BookWithRentalMapper,
     private val bookMapper: BookMapper
-):BookRepository {
-    override fun findAllWithRental():List<BookWithRental>{
-        return  bookWithRentalMapper.select().map { toModel(it)}
+) : BookRepository {
+    override fun findAllWithRental(): List<BookWithRental> {
+        return bookWithRentalMapper.select()
+            .map { toModel(it) }
     }
 
     override fun findWithRental(id: Long): BookWithRental? {
-        return bookWithRentalMapper.selectByPrimaryKey(id)?.let { toModel(it)}
+        return bookWithRentalMapper.selectByPrimaryKey(
+            id
+        )?.let { toModel(it) }
     }
 
-    private fun toModel(record: BookWithRentalRecord):BookWithRental{
+    private fun toModel(record: BookWithRentalRecord): BookWithRental {
         val book = Book(
             record.id!!,
             record.title!!,
@@ -42,7 +47,7 @@ class BookRepositoryImpl(
                 record.returnDeadline!!
             )
         }
-        return BookWithRental(book,rental)
+        return BookWithRental(book, rental)
     }
 
     override fun register(book: Book) {
@@ -50,7 +55,28 @@ class BookRepositoryImpl(
     }
 
     private fun toRecord(model: Book): BookRecord {
-        return BookRecord(model.id, model.title, model.author, model.releaseDate)
+        return BookRecord(
+            model.id,
+            model.title,
+            model.author,
+            model.releaseDate
+        )
+    }
+
+    override fun update(
+        id: Long,
+        title: String?,
+        author: String?,
+        releaseDate: LocalDate?
+    ) {
+        bookMapper.updateByPrimaryKeySelective(
+            BookRecord(
+                id,
+                title,
+                author,
+                releaseDate
+            )
+        )
     }
 }
 
